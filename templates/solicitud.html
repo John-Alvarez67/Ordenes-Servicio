@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud</title>
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .form-group button:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Solicitud</h2>
+    <form id="solicitudForm">
+        <div class="form-group">
+            <label for="cotizacion">Cotización:</label>
+            <input type="text" id="cotizacion" name="cotizacion" required>
+        </div>
+        <div class="form-group">
+            <label for="estado">Estado de la Solicitud:</label>
+            <select id="estado" name="estado" required>
+                <option value="pendiente">Pendiente</option>
+                <option value="en_proceso">En Proceso</option>
+                <option value="completado">Completado</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="fecha_entrega">Fecha de Entrega:</label>
+            <input type="date" id="fecha_entrega" name="fecha_entrega" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">Enviar Solicitud</button>
+            <button type="button" onclick="window.location.href='{{ url_for('menu') }}'">Volver al Menú</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

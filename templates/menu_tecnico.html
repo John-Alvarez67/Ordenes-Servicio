@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú tecnico</title>
+    <style>
+        .menu {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .menu-title {
+            font-size: 24px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .menu-options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .menu-options li {
+            padding: 10px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .menu-options li:hover {
+            background-color: #444;
+        }
+        .login-button {
+            background-color: #ff4500;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .login-button:hover {
+            background-color: #ff6347;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu">
+    <div class="menu-title">Menú tecnico</div>
+    <ul class="menu-options">
+        <li onclick="window.location.href='{{ url_for('ver_ordenes') }}'">ver ordenes</li>
+        <li onclick="window.location.href='{{ url_for('solicitud') }}'">Solicitud</li>
+        <li onclick="window.location.href='{{ url_for('equipo') }}'">Equipo</li>
+    </ul>
+    <button class="login-button" onclick="window.location.href='{{ url_for('inicio_sesion') }}'">cerrar sesion</button>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipo</title>
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .form-group button:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Equipo</h2>
+    <form id="equipoForm">
+        <div class="form-group">
+            <label for="marca">Marca:</label>
+            <input type="text" id="marca" name="marca" required>
+        </div>
+        <div class="form-group">
+            <label for="modelo">Modelo:</label>
+            <input type="text" id="modelo" name="modelo" required>
+        </div>
+        <div class="form-group">
+            <label for="numero_serie">Número de Serie:</label>
+            <input type="text" id="numero_serie" name="numero_serie" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">Guardar Equipo</button>
+            <button type="button" onclick="window.location.href='{{ url_for('menu') }}'">Volver al Menú</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

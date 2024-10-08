@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Solitek Soluciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('{{ url_for('static', filename='Imagenes/FO.jpg') }}') no-repeat center center;
+            background-size: cover;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(186, 224, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex; /* Cambio a display flex */
+            flex-direction: row; /* Cambio a disposición horizontal */
+            align-items: center; /* Centrar verticalmente */
+            justify-content: space-around; /* Espacio uniforme entre elementos */
+            flex-wrap: wrap; /* Envolver elementos en caso de que no quepan en una sola fila */
+        }
+
+        .login-container {
+            background: linear-gradient(to bottom right, #00395c, #4682B4);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            flex: 1; /* Para que ocupe el espacio disponible */
+            margin: 10px; /* Espaciado entre elementos */
+        }
+
+        h1 {
+            margin: 0 0 20px 0; /* Espaciado inferior para el título */
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: calc(100% - 22px); /* Ancho ajustado */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #FFD700;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #FFC107;
+        }
+
+        #custom-image {
+            width: 200px;
+            height: 200px;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            display: none;
+        }
+
+        .dropdown a {
+            display: block;
+            text-decoration: none;
+            color: #ffffff;
+            margin-bottom: 5px;
+            font-weight: bold;
+            background: linear-gradient(to bottom right, #00395c, #4682B4);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .dropdown a:hover {
+            color: #000000;
+        }
+
+        .container:hover .dropdown {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="custom-image" src="{{ url_for('static', filename='Imagenes/Logo2.png') }}" alt="Imagen Personalizada">
+        <div>
+            <h1>Iniciar Sesión</h1>
+            <form action="{{ url_for('inicio_sesion') }}" method="post" class="login-container">
+                <label for="correo">Correo electrónico:</label>
+                <input type="email" id="correo" name="correo" required>
+                <br>
+                <label for="contraseña">Contraseña:</label>
+                <input type="password" id="contraseña" name="contraseña" required maxlength="8">
+                <br>
+                <input type="submit" value="Iniciar Sesión">
+            </form>
+        </div>
+        <div>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li style="color: red;">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+            <p>El dominio aceptado es @hotmail.com</p>
+            <p>¿No tienes una cuenta? <a href="{{ url_for('index') }}">Regístrate</a></p>
+        </div>
+    </div>
+</body>
+</html>

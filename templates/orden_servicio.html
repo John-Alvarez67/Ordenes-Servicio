@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Orden de Servicio</title>
+</head>
+<body>
+    <h1>Crear Orden de Servicio</h1>
+    <form action="{{ url_for('crear_orden_servicio') }}" method="post">
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion" required></textarea><br><br>
+        
+        <!-- Agrega el campo correo_usuario -->
+        <label for="correo_usuario">Correo de Usuario:</label>
+        <input type="text" id="correo_usuario" name="correo_usuario" required><br><br>
+        
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!-- templates/ver_ordenes.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Órdenes de Servicio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Órdenes de Servicio</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descripción</th>
+                <th>Correo del Usuario</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden in ordenes %}
+            <tr>
+                <td>{{ orden.id }}</td>
+                <td>{{ orden.descripcion }}</td>
+                <td>{{ orden.correo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('menu_tecnico') }}">Volver al menú</a>
+</body>
+</html>
