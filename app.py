@@ -20,7 +20,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'inicio_sesion'
 
 # Cadena de conexión a PostgreSQL
-connection_string = 'postgresql://juan:12345678@localhost:5432/web'
+connection_string = 'postgresql://juan:12345678@db:5432/web'
 engine = create_engine(connection_string)
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
@@ -35,4 +35,4 @@ def load_user(user_id):
 
 if __name__ == '__main__':
     from routes import *
-    app.run(debug=True)
+    app.run( debug=True)

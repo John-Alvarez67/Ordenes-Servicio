@@ -1,0 +1,26 @@
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: juan
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: web
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://juan:12345678@db:5432/web
+    depends_on:
+      - db
+    command: >
+      sh -c "sleep 5 && python app.py"  # Esperar 5 segundos antes de iniciar la aplicación
+
+volumes:
+  db_data:
