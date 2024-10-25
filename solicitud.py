@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 from usuario import Base  # Importa Base de tu configuración actual
 
 class SolicitudReparacion(Base):
-    __tablename__ = 'solicitudes_reparacion'
+    __tablename__ = 'solicitud'
     
     id = Column(Integer, primary_key=True)
     nombre = Column(String(100), nullable=False)

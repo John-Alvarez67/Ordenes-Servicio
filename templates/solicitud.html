@@ -1,58 +1,71 @@
 <!-- templates/solicitud.html -->
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Solicitud de Reparación</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
     <div class="container">
-        <h2>Formulario de Solicitud de Reparación</h2>
-        <form action="/crear_orden_servicio" method="POST">
-            <!-- Información del Cliente -->
-            <div class="form-group">
-                <label for="nombre">Nombre completo:</label>
-                <input type="text" id="nombre" name="nombre" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="correo">Correo electrónico:</label>
-                <input type="email" id="correo" name="correo" required>
-            </div>
+      <h2>Formulario de Solicitud de Reparación</h2>
+      <form action="/crear_orden_servicio" method="POST">
+        <!-- Información del Cliente -->
+        <div class="form-group">
+          <label for="nombre">Nombre completo:</label>
+          <input type="text" id="nombre" name="nombre" required />
+        </div>
 
-            <div class="form-group">
-                <label for="telefono">Número de contacto:</label>
-                <input type="tel" id="telefono" name="telefono" required>
-            </div>
+        <div class="form-group">
+          <label for="correo">Correo electrónico:</label>
+          <input type="email" id="correo" name="correo" required />
+        </div>
 
-            <div class="form-group">
-                <label for="direccion">Dirección (opcional):</label>
-                <input type="text" id="direccion" name="direccion">
-            </div>
+        <div class="form-group">
+          <label for="telefono">Número de contacto:</label>
+          <input type="tel" id="telefono" name="telefono" required />
+        </div>
 
-            <!-- Información del Equipo -->
-            <div class="form-group">
-                <label for="nombre_equipo">Nombre del equipo:</label>
-                <input type="text" id="nombre_equipo" name="nombre_equipo" required>
-            </div>
+        <div class="form-group">
+          <label for="direccion">Dirección (opcional):</label>
+          <input type="text" id="direccion" name="direccion" />
+        </div>
 
-            <div class="form-group">
-                <label for="modelo_equipo">Modelo del equipo:</label>
-                <input type="text" id="modelo_equipo" name="modelo_equipo" required>
-            </div>
+        <!-- Información del Equipo -->
+        <div class="form-group">
+          <label for="nombre_equipo">Nombre del equipo:</label>
+          <input type="text" id="nombre_equipo" name="nombre_equipo" required />
+        </div>
 
-            <div class="form-group">
-                <label for="descripcion">Descripción del problema:</label>
-                <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
-            </div>
+        <div class="form-group">
+          <label for="modelo_equipo">Modelo del equipo:</label>
+          <input type="text" id="modelo_equipo" name="modelo_equipo" required />
+        </div>
 
-            <!-- Botón de Envío -->
-            <div class="form-group">
-                <button type="submit">Enviar Solicitud</button>
-            </div>
-        </form>
+        <div class="form-group">
+          <label for="descripcion">Descripción del problema:</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Botón de Envío -->
+        <div class="form-group">
+          <button type="submit">Enviar Solicitud</button>
+        </div>
+        <!-- Mensaje de confirmacion de Envio -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+      </form>
     </div>
-</body>
+  </body>
 </html>

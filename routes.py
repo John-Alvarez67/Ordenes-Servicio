@@ -7,6 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from OrdenServicio import OrdenServicio
 from Tecnico import Tecnico
 from flask_login import current_user
+from solicitud import SolicitudReparacion
+
 
 @app.route('/')
 def index():
@@ -128,9 +130,10 @@ def crear_orden_servicio():
         finally:
             session.close()
 
-    return redirect(url_for('menu'))
+    return render_template('solicitud.html')
 
-@app.route('/menu')
+
+@app.route('/menu') 
 @login_required
 def menu():
     return render_template('menu.html')
