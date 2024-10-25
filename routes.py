@@ -96,19 +96,39 @@ def ver_ordenes():
 @app.route('/crear_orden_servicio', methods=['POST'])
 def crear_orden_servicio():
     if request.method == 'POST':
+        # Obtener datos del formulario
+        nombre = request.form['nombre']
+        correo = request.form['correo']
+        telefono = request.form['telefono']
+        direccion = request.form.get('direccion')  # Opcional
+        nombre_equipo = request.form['nombre_equipo']
+        modelo_equipo = request.form['modelo_equipo']
         descripcion = request.form['descripcion']
-        correo_usuario = request.form['correo_usuario']
-
-        nueva_orden = OrdenServicio(correo=correo_usuario, descripcion=descripcion)
+        
+        # Crear instancia de SolicitudReparacion
+        nueva_solicitud = SolicitudReparacion(
+            nombre=nombre,
+            correo=correo,
+            telefono=telefono,
+            direccion=direccion,
+            nombre_equipo=nombre_equipo,
+            modelo_equipo=modelo_equipo,
+            descripcion=descripcion
+        )
 
         session = Session()
         try:
-            session.add(nueva_orden)
+            # Guardar en la base de datos
+            session.add(nueva_solicitud)
             session.commit()
+            flash('Solicitud de reparación creada exitosamente.', 'success')
+        except Exception as e:
+            session.rollback()
+            flash(f'Error al crear la solicitud: {str(e)}', 'error')
         finally:
             session.close()
 
-        return redirect(url_for('menu'))
+    return redirect(url_for('menu'))
 
 @app.route('/menu')
 @login_required
