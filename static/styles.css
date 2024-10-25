@@ -8,8 +8,8 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
     color: #333;
+    background: url("Imagenes/FO.jpg") ;
 }
 
 .container {
@@ -17,7 +17,8 @@ body {
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
-    background-color: #fff;
+    opacity: 90%;
+    background-color: #a1b9d4;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
@@ -53,7 +54,7 @@ textarea {
 button {
     width: 100%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #014e82;
     color: white;
     border: none;
     border-radius: 5px;
@@ -63,5 +64,5 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #000983;
 }
