@@ -8,17 +8,17 @@ stage('Clone Repository') {
 }
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                bat 'pip install -r requirements.txt'
             }
         }
         stage('Run Security Analysis') {
             steps {
-                sh 'bandit -r .'  // Ejecuta Bandit para analizar vulnerabilidades en el código
+                bat 'bandit -r .'  // Ejecuta Bandit para analizar vulnerabilidades en el código
             }
         }
         stage('Run Tests') {
             steps {
-                sh 'pytest'  // Ejecuta pruebas automatizadas si tienes configuradas
+                bat 'pytest'  // Ejecuta pruebas automatizadas si tienes configuradas
             }
         }
     }
