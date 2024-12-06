@@ -102,5 +102,12 @@ def cerrar_sesion():
     flash('Sesión cerrada', 'success')
     return redirect(url_for('inicio_sesion'))
 
+@app.route('/orden_servicio')
+def orden_servicio():
+    return render_template('orden_servicio.html')
+@app.route('/solicitud', methods=['GET', 'POST'])
+def solicitud():
+    return render_template('solicitud.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
