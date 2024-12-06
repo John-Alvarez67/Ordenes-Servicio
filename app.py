@@ -43,3 +43,7 @@ if __name__ == '__main__':
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     Session.remove()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
