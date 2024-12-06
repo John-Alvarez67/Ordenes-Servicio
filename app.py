@@ -29,9 +29,9 @@ def registro():
     return redirect(url_for('index'))
 
 # Ruta para el inicio de sesión
-@app.route('/inicio_sesion')
+@app.route('/inicio_sesion', methods=['GET', 'POST'])
 def inicio_sesion():
-    return "Página de inicio de sesión (en desarrollo)"  # Puedes personalizar esta página
+    return render_template('inicio_sesion.html') # Puedes personalizar esta página
 
 if __name__ == '__main__':
     app.run(debug=True)
