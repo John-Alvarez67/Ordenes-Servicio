@@ -34,13 +34,23 @@ def load_user(user_id):
     finally:
         session.close()
 
-# Rutas importadas desde otro módulo
-if __name__ == '__main__':
-    from routes import *
-    app.run(debug=True)
+# Ruta principal para evitar errores 404
+@app.route("/")
+def index():
+    return "Bienvenido a la aplicación de Órdenes de Servicio!"
+
+# Ruta para favicon
+@app.route('/favicon.ico')
+def favicon():
+    return "", 204
 
 # Asegurarse de remover la sesión al final del ciclo de vida de la app
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     Session.remove()
+
+# Rutas importadas desde otro módulo
+if __name__ == '__main__':
+    from routes import *
+    app.run(host='0.0.0.0', port=10000)
 
