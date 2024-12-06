@@ -37,7 +37,7 @@ def inicio_sesion():
         contraseña = request.form.get('contraseña')
 
         # Simulación de credenciales válidas
-        usuario_valido = correo == 'usuario@hotmail.com' and contraseña == '12345678'
+        usuario_valido = correo == '@hotmail.com' and contraseña == '12345678'
 
         if usuario_valido:
             flash('Inicio de sesión exitoso', 'success')
