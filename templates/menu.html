@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script>
+        setTimeout(function() {
+            window.location.href = "{{ url_for('menu') }}";
+        }, 2000); // 2000 milisegundos (2 segundos) de retraso
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú</title>

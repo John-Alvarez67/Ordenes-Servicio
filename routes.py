@@ -1,5 +1,3 @@
-# routes.py
-
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user, login_user, logout_user
 from app import app, Session
@@ -7,10 +5,9 @@ from usuario import Usuario
 from validaciones import Validaciones
 from sqlalchemy.exc import IntegrityError
 from OrdenServicio import OrdenServicio
-from flask_login import current_user
-from OrdenServicio import OrdenServicio
 from Tecnico import Tecnico
-from flask_login import login_required
+from flask_login import current_user
+from solicitud import SolicitudReparacion
 
 
 @app.route('/')
@@ -51,23 +48,22 @@ def inicio_sesion():
         correo = request.form['correo']
         contraseña = request.form['contraseña']
         session = Session()
-        
+
         tecnico = session.query(Tecnico).filter_by(correo=correo, contraseña=contraseña).first()
         if tecnico:
             login_user(tecnico)
             session.close()
             return redirect(url_for('menu_tecnico'))
-        
+
         usuario = session.query(Usuario).filter_by(correo=correo, contraseña=contraseña).first()
         if usuario:
             login_user(usuario)
             session.close()
             return redirect(url_for('menu'))
-        
+
         flash('Credenciales inválidas. Inténtalo de nuevo.', 'error')
         session.close()
     return render_template('inicio_sesion.html')
-
 
 @app.route('/orden_servicio', methods=['GET', 'POST'])
 @login_required
@@ -76,49 +72,74 @@ def orden_servicio():
         descripcion = request.form['descripcion']
         nueva_orden = OrdenServicio(descripcion=descripcion, usuario_correo=current_user.correo)
         session = Session()
-        session.add(nueva_orden)
-        session.commit()
-        flash('Orden de servicio creada exitosamente.', 'success')
-        session.close()
+        try:
+            session.add(nueva_orden)
+            session.commit()
+            flash('Orden de servicio creada exitosamente.', 'success')
+        finally:
+            session.close()
     return render_template('orden_servicio.html')
 
+# Consolidación de ver_ordenes en una única ruta
+@app.route('/ver_ordenes')
+@login_required
 def ver_ordenes():
-    if not current_user.is_authenticated:
-        flash('User not authenticated', 'error')
-        return redirect(url_for('inicio_sesion'))
-
-    if not isinstance(current_user, Tecnico):
-        flash('Access denied: User is not a technician', 'error')
-        return redirect(url_for('menu'))
-
     session = Session()
-    ordenes = session.query(OrdenServicio).all()
-    session.close()
+    try:
+        if isinstance(current_user, Tecnico):
+            ordenes = session.query(OrdenServicio).all()
+        else:
+            flash('Acceso denegado: Solo técnicos pueden ver las órdenes.', 'error')
+            return redirect(url_for('menu'))
+    finally:
+        session.close()
     return render_template('ver_ordenes.html', ordenes=ordenes)
 
 @app.route('/crear_orden_servicio', methods=['POST'])
 def crear_orden_servicio():
     if request.method == 'POST':
+        # Obtener datos del formulario
+        nombre = request.form['nombre']
+        correo = request.form['correo']
+        telefono = request.form['telefono']
+        direccion = request.form.get('direccion')  # Opcional
+        nombre_equipo = request.form['nombre_equipo']
+        modelo_equipo = request.form['modelo_equipo']
         descripcion = request.form['descripcion']
-        correo_usuario = request.form['correo_usuario']
         
-        # Aquí necesitas corregir el nombre del parámetro
-        nueva_orden = OrdenServicio(correo=correo_usuario, descripcion=descripcion)
-        
-        session = Session()
-        session.add(nueva_orden)
-        session.commit()
-        session.close()
-        
-        return redirect(url_for('menu'))
-    
+        # Crear instancia de SolicitudReparacion
+        nueva_solicitud = SolicitudReparacion(
+            nombre=nombre,
+            correo=correo,
+            telefono=telefono,
+            direccion=direccion,
+            nombre_equipo=nombre_equipo,
+            modelo_equipo=modelo_equipo,
+            descripcion=descripcion
+        )
 
-@app.route('/menu')
+        session = Session()
+        try:
+            # Guardar en la base de datos
+            session.add(nueva_solicitud)
+            session.commit()
+            flash('Solicitud de reparación creada exitosamente.', 'success')
+        except Exception as e:
+            session.rollback()
+            flash(f'Error al crear la solicitud: {str(e)}', 'error')
+        finally:
+            session.close()
+
+    return render_template('solicitud.html')
+
+
+@app.route('/menu') 
 @login_required
 def menu():
     return render_template('menu.html')
 
 @app.route('/menu_tecnico')
+@login_required
 def menu_tecnico():
     return render_template('menu_tecnico.html')
 
@@ -130,18 +151,13 @@ def solicitud():
 def equipo():
     return render_template('equipo.html')
 
-@app.route('/ver_ordenes')
-def ver_ordenes():
-    session = Session()
-    ordenes = session.query(OrdenServicio).all()
-    session.close()
-    return render_template('ver_ordenes.html', ordenes=ordenes)
-
-
+# Función para cargar usuarios (simplificada)
 def load_user(correo):
     session = Session()
-    user = session.query(Usuario).filter_by(correo=correo).first()
-    if not user:
-        user = session.query(Tecnico).filter_by(correo=correo).first()
-    session.close()
+    try:
+        user = session.query(Usuario).filter_by(correo=correo).first()
+        if not user:
+            user = session.query(Tecnico).filter_by(correo=correo).first()
+    finally:
+        session.close()
     return user
