@@ -1,35 +1,17 @@
-from app import app, Session
+# validaciones.py
+def validar_correo(correo):
+    # Lógica de validación para el correo
+    if '@hotmail.com' not in correo:
+        return False
+    return True
 
-class Validaciones:
-    @staticmethod
-    def validar_correo(correo):
-        dominio_permitido = '@hotmail.com'
-        return correo.endswith(dominio_permitido)
+def validar_contraseña(contraseña):
+    # Lógica de validación para la contraseña
+    if len(contraseña) > 8 or not contraseña.isdigit():
+        return False
+    return True
 
-    @staticmethod
-    def validar_contraseña(contraseña):
-        return len(contraseña) <= 8 and contraseña.isdigit()
-
-    @staticmethod
-    def verificar_inicio_sesion(correo, contraseña, session):
-        # Utiliza la sesión de la base de datos para consultar el usuario
-        from usuario import Usuario
-        usuario = session.query(Usuario).filter_by(correo=correo, contraseña=contraseña).first()
-        return usuario is not None
-    @staticmethod
-    def verificar_inicio_sesion_tecnico(correo, contraseña, session: Session):
-        from Tecnico import Tecnico
-        tecnico = session.query(Tecnico).filter_by(correo=correo, contraseña=contraseña).first()
-        return tecnico is not None
-
-    @staticmethod
-    def verificar_tipo_usuario(correo, contraseña, session: Session):
-        from usuario import Usuario
-        from Tecnico import Tecnico
-        usuario = session.query(Usuario).filter_by(correo=correo, contraseña=contraseña).first()
-        if usuario:
-            return 'usuario'
-        tecnico = session.query(Tecnico).filter_by(correo=correo, contraseña=contraseña).first()
-        if tecnico:
-            return 'tecnico'
-        return None
+# Aquí añadimos una función que obtiene el 'app' y 'Session' solo cuando los necesitemos
+def obtener_app_y_session():
+    from app import app, Session  # Importar aquí evita el ciclo circular
+    return app, Session

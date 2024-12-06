@@ -1,38 +1,30 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user, login_user, logout_user
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import IntegrityError
+from validaciones import obtener_app_y_session
 from usuario import Usuario
-from Tecnico import Tecnico
+from sqlalchemy.exc import IntegrityError
 from OrdenServicio import OrdenServicio
+from Tecnico import Tecnico
 from solicitud import SolicitudReparacion
-from validaciones import Validaciones
+import validaciones
 
-# Configuración de la aplicación
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'mi_clave_secreta'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mi_base_de_datos.db'
-db = SQLAlchemy(app)
-
-# Ruta para la página de inicio (index)
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Obtener la instancia de app y Session desde validaciones.py para evitar import circular
+app, Session = obtener_app_y_session()
 
 # Ruta para el registro de usuarios
 @app.route('/registrar', methods=['POST'])
 def registro():
     correo = request.form['correo']
     contraseña = request.form['contraseña']
-    session = db.session
+    session = Session()
 
     # Validar correo electrónico
-    if not Validaciones.validar_correo(correo):
+    if not validaciones.validar_correo(correo):
         flash('El correo electrónico debe tener el dominio @hotmail.com', 'error')
         return redirect(url_for('index'))
 
     # Validar contraseña
-    if not Validaciones.validar_contraseña(contraseña):
+    if not validaciones.validar_contraseña(contraseña):
         flash('La contraseña debe ser un máximo de 8 dígitos numéricos', 'error')
         return redirect(url_for('index'))
 
@@ -56,7 +48,7 @@ def inicio_sesion():
     if request.method == 'POST':
         correo = request.form['correo']
         contraseña = request.form['contraseña']
-        session = db.session
+        session = Session()
 
         # Buscar al usuario o técnico en la base de datos
         usuario = session.query(Usuario).filter_by(correo=correo, contraseña=contraseña).first()
@@ -75,18 +67,11 @@ def inicio_sesion():
 
     return render_template('inicio_sesion.html')
 
-# Ruta para cerrar sesión
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
 # Ruta para órdenes de servicio
 @app.route('/orden_servicio', methods=['GET', 'POST'])
 @login_required
 def orden_servicio():
-    session = db.session
+    session = Session()
     if request.method == 'POST':
         descripcion = request.form['descripcion']
         nueva_orden = OrdenServicio(descripcion=descripcion, usuario_correo=current_user.correo)
@@ -116,7 +101,7 @@ def menu():
 @app.route('/menu_tecnico')
 @login_required
 def menu_tecnico():
-    session = db.session
+    session = Session()
     ordenes = session.query(OrdenServicio).all()
     session.close()
     return render_template('menu_tecnico.html', ordenes=ordenes)
@@ -136,7 +121,7 @@ def solicitud():
             descripcion=request.form['descripcion']
         )
 
-        session = db.session
+        session = Session()
         try:
             session.add(nueva_solicitud)
             session.commit()
@@ -148,8 +133,3 @@ def solicitud():
             session.close()
 
     return render_template('solicitud.html')
-
-# Si ejecutas el archivo directamente, Flask iniciará la app
-if __name__ == "__main__":
-    app.run(debug=True)
-
