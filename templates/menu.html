@@ -66,10 +66,12 @@
         <li onclick="window.location.href='{{ url_for('equipo') }}'">Equipo</li>
     </ul>
     
-    <div class="user-email">{{ current_user.correo }}</div>
-    <button class="login-button" onclick="window.location.href='{{ url_for('inicio_sesion') }}'">Cerrar Sesión</button>
+    <!-- Mostrar el correo del usuario autenticado -->
+    <div class="user-email">{{ current_user.email }}</div>
+    
+    <!-- Botón para cerrar sesión -->
+    <button class="login-button" onclick="window.location.href='{{ url_for('logout') }}'">Cerrar Sesión</button>
 </div>
 
 </body>
 </html>
-
