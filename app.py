@@ -108,6 +108,11 @@ def orden_servicio():
 @app.route('/solicitud', methods=['GET', 'POST'])
 def solicitud():
     return render_template('solicitud.html')
+@app.route('/equipo')
+def equipo():
+    # Lógica de la vista
+    return render_template('equipo.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
