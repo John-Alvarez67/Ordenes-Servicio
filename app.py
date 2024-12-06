@@ -33,5 +33,7 @@ def registro():
 def inicio_sesion():
     return render_template('inicio_sesion.html') # Puedes personalizar esta página
 
+
+
 if __name__ == '__main__':
     app.run(debug=True)

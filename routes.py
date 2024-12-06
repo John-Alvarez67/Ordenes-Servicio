@@ -8,6 +8,11 @@ from OrdenServicio import OrdenServicio
 from Tecnico import Tecnico
 from solicitud import SolicitudReparacion
 
+# Ruta para la página de inicio (index)
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 # Ruta para el registro de usuarios
 @app.route('/registrar', methods=['POST'])
 def registro():
@@ -130,4 +135,3 @@ def solicitud():
             session.close()
 
     return render_template('solicitud.html')
-
