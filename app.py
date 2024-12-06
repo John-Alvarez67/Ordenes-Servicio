@@ -17,8 +17,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'inicio_sesion'
 
-# Cadena de conexión a PostgreSQL desde variables de entorno (más seguro)
-connection_string = os.getenv('DATABASE_URL', 'postgresql://juan:12345678@localhost:5432/web')
+# Cadena de conexión a PostgreSQL desde variables de entorno
+connection_string = os.getenv('DATABASE_URL')  # Asegúrate de que esta variable esté configurada en Render
 
 # Motor y sesión de base de datos
 engine = create_engine(connection_string)
@@ -43,11 +43,3 @@ if __name__ == '__main__':
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     Session.remove()
-# Obtén la URL de la base de datos desde la variable de entorno
-Database = os.getenv("Database")
-
-# Configura el motor de SQLAlchemy
-engine = create_engine(Database)
-
-# (Si usas declarative_base o metadata)
-Base.metadata.create_all(engine)
