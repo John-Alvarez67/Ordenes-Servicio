@@ -1,163 +1,96 @@
-from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user, login_user, logout_user
-from app import app, Session
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required, login_user, current_user, logout_user
 from usuario import Usuario
 from validaciones import Validaciones
 from sqlalchemy.exc import IntegrityError
 from OrdenServicio import OrdenServicio
 from Tecnico import Tecnico
-from flask_login import current_user
 from solicitud import SolicitudReparacion
+from app import Session
 
+# Crear Blueprint
+app_routes = Blueprint('app_routes', __name__)
 
-@app.route('/')
+@app_routes.route('/')
 def index():
     return render_template('index.html')
 
-# Ruta para el registro de usuarios
-@app.route('/registrar', methods=['POST'])
+@app_routes.route('/registrar', methods=['POST'])
 def registro():
-    if request.method == 'POST':
-        correo = request.form['correo']
-        contraseña = request.form['contraseña']
-        session = Session()
-        # Validar correo electrónico
+    correo = request.form['correo']
+    contraseña = request.form['contraseña']
+    session = Session()
+    try:
         if not Validaciones.validar_correo(correo):
-            flash('El correo electrónico debe tener el dominio @hotmail.com', 'error')
-            return redirect(url_for('index'))
-        # Validar contraseña
+            flash('El correo debe ser @hotmail.com', 'error')
+            return redirect(url_for('app_routes.index'))
         if not Validaciones.validar_contraseña(contraseña):
-            flash('La contraseña debe ser un máximo de 8 dígitos numéricos', 'error')
-            return redirect(url_for('index'))
-        # Registrar usuario en la base de datos
-        try:
-            nuevo_usuario = Usuario(correo=correo, contraseña=contraseña)
-            session.add(nuevo_usuario)
-            session.commit()
-            flash('Usuario registrado correctamente.', 'success')
-        except IntegrityError:
-            session.rollback()
-            flash('El correo ya está registrado.', 'error')
-        finally:
-            session.close()
-    return redirect(url_for('index'))
+            flash('La contraseña debe ser un máximo de 8 dígitos.', 'error')
+            return redirect(url_for('app_routes.index'))
+        
+        nuevo_usuario = Usuario(correo=correo, contraseña=contraseña)
+        session.add(nuevo_usuario)
+        session.commit()
+        flash('Usuario registrado correctamente.', 'success')
+    except IntegrityError:
+        session.rollback()
+        flash('El correo ya está registrado.', 'error')
+    finally:
+        session.close()
+    return redirect(url_for('app_routes.index'))
 
-@app.route('/inicio_sesion', methods=['GET', 'POST'])
+@app_routes.route('/inicio_sesion', methods=['GET', 'POST'])
 def inicio_sesion():
     if request.method == 'POST':
         correo = request.form['correo']
         contraseña = request.form['contraseña']
         session = Session()
-
-        tecnico = session.query(Tecnico).filter_by(correo=correo, contraseña=contraseña).first()
-        if tecnico:
-            login_user(tecnico)
+        try:
+            usuario = session.query(Usuario).filter_by(correo=correo, contraseña=contraseña).first()
+            if usuario:
+                login_user(usuario)
+                return redirect(url_for('app_routes.menu'))
+            flash('Credenciales inválidas.', 'error')
+        finally:
             session.close()
-            return redirect(url_for('menu_tecnico'))
-
-        usuario = session.query(Usuario).filter_by(correo=correo, contraseña=contraseña).first()
-        if usuario:
-            login_user(usuario)
-            session.close()
-            return redirect(url_for('menu'))
-
-        flash('Credenciales inválidas. Inténtalo de nuevo.', 'error')
-        session.close()
     return render_template('inicio_sesion.html')
 
-@app.route('/orden_servicio', methods=['GET', 'POST'])
-@login_required
-def orden_servicio():
-    if request.method == 'POST':
-        descripcion = request.form['descripcion']
-        nueva_orden = OrdenServicio(descripcion=descripcion, usuario_correo=current_user.correo)
-        session = Session()
-        try:
-            session.add(nueva_orden)
-            session.commit()
-            flash('Orden de servicio creada exitosamente.', 'success')
-        finally:
-            session.close()
-    return render_template('orden_servicio.html')
-
-# Consolidación de ver_ordenes en una única ruta
-@app.route('/ver_ordenes')
-@login_required
-def ver_ordenes():
-    session = Session()
-    try:
-        if isinstance(current_user, Tecnico):
-            ordenes = session.query(OrdenServicio).all()
-        else:
-            flash('Acceso denegado: Solo técnicos pueden ver las órdenes.', 'error')
-            return redirect(url_for('menu'))
-    finally:
-        session.close()
-    return render_template('ver_ordenes.html', ordenes=ordenes)
-
-@app.route('/crear_orden_servicio', methods=['POST'])
-def crear_orden_servicio():
-    if request.method == 'POST':
-        # Obtener datos del formulario
-        nombre = request.form['nombre']
-        correo = request.form['correo']
-        telefono = request.form['telefono']
-        direccion = request.form.get('direccion')  # Opcional
-        nombre_equipo = request.form['nombre_equipo']
-        modelo_equipo = request.form['modelo_equipo']
-        descripcion = request.form['descripcion']
-        
-        # Crear instancia de SolicitudReparacion
-        nueva_solicitud = SolicitudReparacion(
-            nombre=nombre,
-            correo=correo,
-            telefono=telefono,
-            direccion=direccion,
-            nombre_equipo=nombre_equipo,
-            modelo_equipo=modelo_equipo,
-            descripcion=descripcion
-        )
-
-        session = Session()
-        try:
-            # Guardar en la base de datos
-            session.add(nueva_solicitud)
-            session.commit()
-            flash('Solicitud de reparación creada exitosamente.', 'success')
-        except Exception as e:
-            session.rollback()
-            flash(f'Error al crear la solicitud: {str(e)}', 'error')
-        finally:
-            session.close()
-
-    return render_template('solicitud.html')
-
-
-@app.route('/menu') 
+@app_routes.route('/menu')
 @login_required
 def menu():
     return render_template('menu.html')
 
-@app.route('/menu_tecnico')
+@app_routes.route('/menu_tecnico')
 @login_required
 def menu_tecnico():
     return render_template('menu_tecnico.html')
 
-@app.route('/solicitud')
+@app_routes.route('/orden_servicio', methods=['GET', 'POST'])
+@login_required
+def orden_servicio():
+    if request.method == 'POST':
+        descripcion = request.form['descripcion']
+        session = Session()
+        try:
+            nueva_orden = OrdenServicio(descripcion=descripcion, usuario_correo=current_user.correo)
+            session.add(nueva_orden)
+            session.commit()
+            flash('Orden creada exitosamente.', 'success')
+        finally:
+            session.close()
+    return render_template('orden_servicio.html')
+
+@app_routes.route('/solicitud', methods=['GET', 'POST'])
 def solicitud():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        descripcion = request.form['descripcion']
+        nueva_solicitud = SolicitudReparacion(nombre=nombre, descripcion=descripcion)
+        session = Session()
+        try:
+            session.add(nueva_solicitud)
+            session.commit()
+            flash('Solicitud creada.', 'success')
+        finally:
+            session.close()
     return render_template('solicitud.html')
-
-@app.route('/equipo')
-def equipo():
-    return render_template('equipo.html')
-
-# Función para cargar usuarios (simplificada)
-def load_user(correo):
-    session = Session()
-    try:
-        user = session.query(Usuario).filter_by(correo=correo).first()
-        if not user:
-            user = session.query(Tecnico).filter_by(correo=correo).first()
-    finally:
-        session.close()
-    return user
