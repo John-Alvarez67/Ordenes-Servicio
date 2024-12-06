@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+import re  # Para la validación del correo y la contraseña
 
 app = Flask(__name__)
 app.secret_key = 'alguna_clave_secreta'  # Necesaria para usar mensajes flash
@@ -20,8 +21,8 @@ def registro():
         return redirect(url_for('index'))
 
     # Validación de la contraseña
-    if len(contraseña) > 8:
-        flash('La contraseña no debe tener más de 8 caracteres', 'error')
+    if len(contraseña) > 8 or not contraseña.isdigit():
+        flash('La contraseña debe ser solo números y no más de 8 caracteres', 'error')
         return redirect(url_for('index'))
 
     # Simula el registro exitoso
@@ -32,12 +33,21 @@ def registro():
 @app.route('/inicio_sesion', methods=['GET', 'POST'])
 def inicio_sesion():
     if request.method == 'POST':
-        # Simula validación de usuario con datos fijos
         correo = request.form.get('correo')
         contraseña = request.form.get('contraseña')
 
+        # Validación del correo (solo @hotmail.com)
+        if not correo.endswith('@hotmail.com'):
+            flash('El correo debe ser del dominio @hotmail.com', 'error')
+            return redirect(url_for('inicio_sesion'))
+
+        # Validación de la contraseña (solo números y máximo 8 caracteres)
+        if len(contraseña) > 8 or not contraseña.isdigit():
+            flash('La contraseña debe ser solo números y no más de 8 caracteres', 'error')
+            return redirect(url_for('inicio_sesion'))
+
         # Simulación de credenciales válidas
-        usuario_valido = correo == '@hotmail.com' and contraseña == '12345678'
+        usuario_valido = correo == 'usuario@hotmail.com' and contraseña == '12345678'
 
         if usuario_valido:
             flash('Inicio de sesión exitoso', 'success')
@@ -54,4 +64,3 @@ def menu():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
