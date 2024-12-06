@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from usuario import Base, Usuario
 import os
-from routes import routes  # Importa el Blueprint
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta'
@@ -35,13 +34,13 @@ def load_user(user_id):
     finally:
         session.close()
 
-# Registrar el Blueprint
-app.register_blueprint(routes)  # Registra el Blueprint aquí
-
+# Rutas importadas desde otro módulo
 if __name__ == '__main__':
+    from routes import *
     app.run(debug=True)
 
 # Asegurarse de remover la sesión al final del ciclo de vida de la app
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     Session.remove()
+
