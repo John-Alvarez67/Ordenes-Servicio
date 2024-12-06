@@ -37,7 +37,7 @@ def load_user(user_id):
 # Ruta principal para evitar errores 404
 @app.route("/")
 def index():
-    return "Bienvenido a la aplicación de Órdenes de Servicio!"
+    return render_template('index.html')
 
 # Ruta para favicon
 @app.route('/favicon.ico')
