@@ -1,39 +1,155 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-"S"
-app = Flask(__name__)
-app.secret_key = 'alguna_clave_secreta'  # Necesaria para usar mensajes flash
+from flask_login import login_required, current_user, login_user, logout_user
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
+from usuario import Usuario
+from Tecnico import Tecnico
+from OrdenServicio import OrdenServicio
+from solicitud import SolicitudReparacion
+from validaciones import Validaciones
 
-# Ruta para la página principal
+# Configuración de la aplicación
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'mi_clave_secreta'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mi_base_de_datos.db'
+db = SQLAlchemy(app)
+
+# Ruta para la página de inicio (index)
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Ruta para manejar el registro de usuario
-@app.route('/registro', methods=['POST'])
+# Ruta para el registro de usuarios
+@app.route('/registrar', methods=['POST'])
 def registro():
-    correo = request.form.get('correo')  # Obtén el correo ingresado
-    contraseña = request.form.get('contraseña')  # Obtén la contraseña ingresada
+    correo = request.form['correo']
+    contraseña = request.form['contraseña']
+    session = db.session
 
-    # Validación del correo
-    if not correo.endswith('@hotmail.com'):
-        flash('El correo debe ser del dominio @hotmail.com', 'error')
+    # Validar correo electrónico
+    if not Validaciones.validar_correo(correo):
+        flash('El correo electrónico debe tener el dominio @hotmail.com', 'error')
         return redirect(url_for('index'))
 
-    # Validación de la contraseña
-    if len(contraseña) > 8:
-        flash('La contraseña no debe tener más de 8 caracteres', 'error')
+    # Validar contraseña
+    if not Validaciones.validar_contraseña(contraseña):
+        flash('La contraseña debe ser un máximo de 8 dígitos numéricos', 'error')
         return redirect(url_for('index'))
 
-    # Simula el registro exitoso
-    flash('Registro exitoso', 'success')
+    try:
+        # Registrar usuario en la base de datos
+        nuevo_usuario = Usuario(correo=correo, contraseña=contraseña)
+        session.add(nuevo_usuario)
+        session.commit()
+        flash('Usuario registrado correctamente.', 'success')
+    except IntegrityError:
+        session.rollback()
+        flash('El correo ya está registrado.', 'error')
+    finally:
+        session.close()
+
     return redirect(url_for('index'))
 
-# Ruta para el inicio de sesión
+# Ruta para iniciar sesión
 @app.route('/inicio_sesion', methods=['GET', 'POST'])
 def inicio_sesion():
-    return render_template('inicio_sesion.html') # Puedes personalizar esta página
+    if request.method == 'POST':
+        correo = request.form['correo']
+        contraseña = request.form['contraseña']
+        session = db.session
 
+        # Buscar al usuario o técnico en la base de datos
+        usuario = session.query(Usuario).filter_by(correo=correo, contraseña=contraseña).first()
+        tecnico = session.query(Tecnico).filter_by(correo=correo, contraseña=contraseña).first()
 
+        if usuario:
+            login_user(usuario)
+            return redirect(url_for('menu'))
+        elif tecnico:
+            login_user(tecnico)
+            return redirect(url_for('menu_tecnico'))
+        else:
+            flash('Credenciales inválidas. Inténtalo de nuevo.', 'error')
 
-if __name__ == '__main__':
+        session.close()
+
+    return render_template('inicio_sesion.html')
+
+# Ruta para cerrar sesión
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+# Ruta para órdenes de servicio
+@app.route('/orden_servicio', methods=['GET', 'POST'])
+@login_required
+def orden_servicio():
+    session = db.session
+    if request.method == 'POST':
+        descripcion = request.form['descripcion']
+        nueva_orden = OrdenServicio(descripcion=descripcion, usuario_correo=current_user.correo)
+
+        try:
+            session.add(nueva_orden)
+            session.commit()
+            flash('Orden de servicio creada exitosamente.', 'success')
+        except Exception as e:
+            session.rollback()
+            flash(f'Error al crear la orden: {str(e)}', 'error')
+        finally:
+            session.close()
+
+    # Listar órdenes de servicio para el usuario actual
+    ordenes = session.query(OrdenServicio).filter_by(usuario_correo=current_user.correo).all()
+    session.close()
+    return render_template('orden_servicio.html', ordenes=ordenes)
+
+# Ruta para el menú principal del usuario
+@app.route('/menu')
+@login_required
+def menu():
+    return render_template('menu.html')
+
+# Ruta para el menú del técnico
+@app.route('/menu_tecnico')
+@login_required
+def menu_tecnico():
+    session = db.session
+    ordenes = session.query(OrdenServicio).all()
+    session.close()
+    return render_template('menu_tecnico.html', ordenes=ordenes)
+
+# Ruta para solicitudes de reparación
+@app.route('/solicitud', methods=['GET', 'POST'])
+def solicitud():
+    if request.method == 'POST':
+        # Crear nueva solicitud
+        nueva_solicitud = SolicitudReparacion(
+            nombre=request.form['nombre'],
+            correo=request.form['correo'],
+            telefono=request.form['telefono'],
+            direccion=request.form.get('direccion'),
+            nombre_equipo=request.form['nombre_equipo'],
+            modelo_equipo=request.form['modelo_equipo'],
+            descripcion=request.form['descripcion']
+        )
+
+        session = db.session
+        try:
+            session.add(nueva_solicitud)
+            session.commit()
+            flash('Solicitud de reparación creada exitosamente.', 'success')
+        except Exception as e:
+            session.rollback()
+            flash(f'Error al crear la solicitud: {str(e)}', 'error')
+        finally:
+            session.close()
+
+    return render_template('solicitud.html')
+
+# Si ejecutas el archivo directamente, Flask iniciará la app
+if __name__ == "__main__":
     app.run(debug=True)
+
