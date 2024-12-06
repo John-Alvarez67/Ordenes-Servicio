@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-import re  # Para la validación del correo y la contraseña
 
 app = Flask(__name__)
 app.secret_key = 'alguna_clave_secreta'  # Necesaria para usar mensajes flash
@@ -21,8 +20,8 @@ def registro():
         return redirect(url_for('index'))
 
     # Validación de la contraseña
-    if len(contraseña) > 8 or not contraseña.isdigit():
-        flash('La contraseña debe ser solo números y no más de 8 caracteres', 'error')
+    if len(contraseña) > 8:
+        flash('La contraseña no debe tener más de 8 caracteres', 'error')
         return redirect(url_for('index'))
 
     # Simula el registro exitoso
@@ -33,34 +32,24 @@ def registro():
 @app.route('/inicio_sesion', methods=['GET', 'POST'])
 def inicio_sesion():
     if request.method == 'POST':
+        # Simular validación de credenciales
         correo = request.form.get('correo')
         contraseña = request.form.get('contraseña')
 
-        # Validación del correo (solo @hotmail.com)
-        if not correo.endswith('@hotmail.com'):
-            flash('El correo debe ser del dominio @hotmail.com', 'error')
-            return redirect(url_for('inicio_sesion'))
-
-        # Validación de la contraseña (solo números y máximo 8 caracteres)
-        if len(contraseña) > 8 or not contraseña.isdigit():
-            flash('La contraseña debe ser solo números y no más de 8 caracteres', 'error')
-            return redirect(url_for('inicio_sesion'))
-
-        # Simulación de credenciales válidas
-        usuario_valido = correo == 'usuario@hotmail.com' and contraseña == '12345678'
-
-        if usuario_valido:
-            flash('Inicio de sesión exitoso', 'success')
-            return redirect(url_for('menu'))  # Redirige al menú
+        # Validar credenciales simuladas (puedes reemplazar con lógica real)
+        if correo == 'usuario@hotmail.com' and contraseña == '12345678':
+            flash('Inicio de sesión exitoso.', 'success')
+            return redirect(url_for('menu'))  # Redirigir al menú
         else:
-            flash('Credenciales incorrectas', 'error')
+            flash('Credenciales inválidas. Inténtalo de nuevo.', 'error')
+            return redirect(url_for('inicio_sesion'))
 
     return render_template('inicio_sesion.html')
 
-# Ruta para el menú principal
+# Ruta para el menú
 @app.route('/menu')
 def menu():
-    return render_template('menu.html')  # Crea esta plantilla para tu menú principal
+    return render_template('menu.html')  # Renderiza tu página del menú
 
-if __name__ == '__main__':
+if __name__ == '_main_':
     app.run(debug=True)
