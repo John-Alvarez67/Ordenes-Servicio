@@ -23,11 +23,9 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
 
         h2 {
-            margin: 0;
             margin-bottom: 15px;
             color: #00395c;
             font-weight: bold;
@@ -56,7 +54,6 @@
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
 
         button:hover {
@@ -72,11 +69,24 @@
             color: #00395c;
             text-decoration: none;
             font-weight: bold;
-            transition: color 0.3s ease;
         }
 
         .link:hover {
             color: #FFD700;
+        }
+
+        ul {
+            padding: 0;
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        li.error {
+            color: red;
+        }
+
+        li.success {
+            color: green;
         }
     </style>
 </head>

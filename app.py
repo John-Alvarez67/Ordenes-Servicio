@@ -1,56 +1,37 @@
-from flask import Flask, render_template, url_for, flash, redirect
-from flask_login import LoginManager
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
-from usuario import Base, Usuario
-import os
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
-app.secret_key = 'clave_secreta'
+app.secret_key = 'alguna_clave_secreta'  # Necesaria para usar mensajes flash
 
-# Configuración para archivos estáticos
-app.static_folder = 'static'
-app.static_url_path = '/static'
-
-# Configuración de Login Manager
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'inicio_sesion'
-
-# Cadena de conexión a PostgreSQL desde variables de entorno
-connection_string = os.getenv('DATABASE_URL')  # Asegúrate de que esta variable esté configurada en Render
-
-# Motor y sesión de base de datos
-engine = create_engine(connection_string)
-Base.metadata.create_all(engine)
-Session = scoped_session(sessionmaker(bind=engine))  # Usar scoped_session para manejo más seguro
-
-# Cargar usuario para sesión
-@login_manager.user_loader
-def load_user(user_id):
-    session = Session()
-    try:
-        return session.get(Usuario, user_id)  # Si estás usando SQLAlchemy 1.4+
-    finally:
-        session.close()
-
-# Ruta principal para evitar errores 404
-@app.route("/")
+# Ruta para la página principal
+@app.route('/')
 def index():
     return render_template('index.html')
 
-# Ruta para favicon
-@app.route('/favicon.ico')
-def favicon():
-    return "", 204
+# Ruta para manejar el registro de usuario
+@app.route('/registro', methods=['POST'])
+def registro():
+    correo = request.form.get('correo')  # Obtén el correo ingresado
+    contraseña = request.form.get('contraseña')  # Obtén la contraseña ingresada
 
-# Asegurarse de remover la sesión al final del ciclo de vida de la app
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    Session.remove()
+    # Validación del correo
+    if not correo.endswith('@hotmail.com'):
+        flash('El correo debe ser del dominio @hotmail.com', 'error')
+        return redirect(url_for('index'))
 
-# Rutas importadas desde otro módulo
+    # Validación de la contraseña
+    if len(contraseña) > 8:
+        flash('La contraseña no debe tener más de 8 caracteres', 'error')
+        return redirect(url_for('index'))
+
+    # Simula el registro exitoso
+    flash('Registro exitoso', 'success')
+    return redirect(url_for('index'))
+
+# Ruta para el inicio de sesión
+@app.route('/inicio_sesion')
+def inicio_sesion():
+    return "Página de inicio de sesión (en desarrollo)"  # Puedes personalizar esta página
+
 if __name__ == '__main__':
-    from routes import *
-    app.run(host='0.0.0.0', port=10000)
-
+    app.run(debug=True)
