@@ -43,3 +43,11 @@ if __name__ == '__main__':
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     Session.remove()
+# Obtén la URL de la base de datos desde la variable de entorno
+Database = os.getenv("Database")
+
+# Configura el motor de SQLAlchemy
+engine = create_engine(Database)
+
+# (Si usas declarative_base o metadata)
+Base.metadata.create_all(engine)
